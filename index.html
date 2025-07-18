@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCSL Division H Divisionals</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .tab-link.active {
+            border-color: #dc2626; /* red-600 */
+            color: #dc2626; /* red-600 */
+            font-weight: 600;
+        }
+        /* Style for pinned swimmer rows (yellow) */
+        .pin-highlight {
+            background-color: #fef9c3 !important; /* Tailwind's yellow-100 */
+            border-left: 4px solid #facc15; /* Tailwind's yellow-400 */
+        }
+        /* Style for searched swimmer rows (green) */
+        .search-highlight {
+            background-color: #dcfce7 !important; /* Tailwind's green-100 */
+            border-left: 4px solid #4ade80; /* Tailwind's green-400 */
+        }
+        .controls-content.hidden {
+            display: none;
+        }
+        .swimmer-row {
+            transition: all 0.2s ease;
+        }
+        
+        .swimmer-row:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* View mode styles */
+        .hidden-by-view {
+            display: none !important;
+        }
+        
+        /* Mobile-optimized swimmer rows */
+        @media (max-width: 768px) {
+            .swimmer-row {
+                display: block !important;
+                padding: 12px !important;
+                margin-bottom: 8px;
+                background: inherit !important;
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+            }
+            
+            .swimmer-row > div {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 4px;
+            }
+            
+            .swimmer-row > div:last-child {
+                margin-bottom: 0;
+            }
+            
+            .swimmer-name {
+                font-size: 16px !important;
+                font-weight: 600 !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .swimmer-details {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            
+            .swimmer-ready {
+                display: flex !important;
+                justify-content: center !important;
+                margin-top: 8px !important;
+            }
+            
+            .swimmer-ready input[type="checkbox"] {
+                width: 20px !important;
+                height: 20px !important;
+                appearance: none !important;
+                -webkit-appearance: none !important;
+                border: 2px solid #d1d5db !important;
+                border-radius: 4px !important;
+                background-color: white !important;
+                cursor: pointer !important;
+                position: relative !important;
+            }
+            
+            .swimmer-ready input[type="checkbox"]:checked {
+                background-color: #dc2626 !important;
+                border-color: #dc2626 !important;
+            }
+            
+            .swimmer-ready input[type="checkbox"]:checked::after {
+                content: '✓' !important;
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                color: white !important;
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+            
+            /* Hide table headers on mobile */
+            .heat .hidden {
+                display: none !important;
+            }
+            
+            .heat h3 {
+                font-size: 14px !important;
+                margin-bottom: 12px !important;
+            }
+            
+            /* Make controls container more accessible on mobile */
+            #controlsContainer {
+                position: fixed !important;
+                top: 120px !important;
+                left: 0 !important;
+                right: 0 !important;
+                margin: 0 8px !important;
+                z-index: 50 !important;
+            }
+            
+            /* Add top margin to content to account for fixed controls */
+            #meet-program {
+                margin-top: 200px !important;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        .touch-manipulation {
+            touch-action: manipulation;
+        }
+
+        /* Mobile scrolling optimization */
+        @media (max-width: 768px) {
+            .overflow-y-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            body {
+                -webkit-text-size-adjust: 100%;
+            }
+            
+            /* Improve tap targets */
+            button, input, select, textarea {
+                min-height: 44px;
+            }
+            
+            /* Better focus states for mobile */
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px #dc2626;
+            }
+        }
+
+        /* Improved pinned swimmer tags for mobile */
+        @media (max-width: 768px) {
+            .bg-red-100 {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .bg-red-100 button {
+                margin-left: 8px;
+                font-size: 18px;
+                line-height: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Main Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-20">
+        <div class="max-w-4xl mx-auto px-4 py-3 md:py-4 text-center">
+            <h1 class="text-lg md:text-2xl font-bold text-gray-900">MCSL Division H Championship</h1>
+            <p class="text-sm md:text-md text-gray-500">July 19, 2025</p>
+            <div class="text-sm md:text-lg font-semibold mt-1 md:mt-2 flex justify-center items-center flex-wrap gap-x-2 md:gap-x-4">
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #fee2e2;"></div><span class="text-xs md:text-base" style="color: #dc2626;">Rock Creek (RC)</span></span>
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dbeafe;"></div><span class="text-xs md:text-base" style="color: #1e40af;">Calverton (CA)</span></span>
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e2e8f0;"></div><span class="text-xs md:text-base" style="color: #172554;">Glenmont (GP)</span></span>
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dcfce7;"></div><span class="text-xs md:text-base" style="color: #166534;">Daleview (DV)</span></span>
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #ffedd5;"></div><span class="text-xs md:text-base" style="color: #9a3412;">Hillandale (HA)</span></span>
+                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e0e7ff;"></div><span class="text-xs md:text-base" style="color: #312e81;">Twinbrook (TW)</span></span>
+            </div>
+        </div>
+        <!-- Tabs -->
+        <nav class="border-b border-gray-200">
+            <div class="max-w-4xl mx-auto flex justify-center -mb-px">
+                <button class="tab-link active w-1/2 py-3 md:py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Program')">
+                    Meet Program
+                </button>
+                <button class="tab-link w-1/2 py-3 md:py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Records')">
+                    Records & All-Stars
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4">
+        <!-- Meet Program Content -->
+        <div id="Program" class="content active">
+            <!-- Collapsible Controls Container -->
+            <div id="controlsContainer" class="bg-white rounded-xl shadow-md mb-6 sticky top-[140px] md:top-[155px] z-10">
+                <div class="flex justify-between items-center p-3 md:p-4 border-b border-gray-200">
+                    <h3 class="text-base md:text-lg font-semibold">Tools & Filters</h3>
+                    <button id="toggleControlsBtn" class="p-2 rounded-full hover:bg-gray-100 touch-manipulation">
+                        <svg id="toggleIcon" class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                    </button>
+                </div>
+
+                <div id="controlsContent" class="controls-content p-3 md:p-4">
+                    <!-- Combined search controls -->
+                    <div class="space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Search & Pin Swimmers</label>
+                            <div class="relative">
+                                <input type="text" id="swimmerSearch" onkeyup="handleCombinedSearch()" onfocus="showSearchOptions()" placeholder="Search swimmers..." class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
+                                <div id="searchOptions" class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-30 hidden"></div>
+                            </div>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <input id="searchMode" name="searchMode" type="radio" value="search" checked class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
+                                    <label for="searchMode" class="ml-2 block text-sm">Search</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="pinMode" name="searchMode" type="radio" value="pin" class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
+                                    <label for="pinMode" class="ml-2 block text-sm">Pin</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jump to Event</label>
+                            <select id="eventJump" onchange="jumpToEvent()" class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
+                                <option value="">Select an event to jump to...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Secondary controls - collapsible on mobile -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="md:hidden">
+                            <button id="mobileAdvancedToggle" class="w-full text-left text-sm font-medium text-gray-700 py-2 flex justify-between items-center touch-manipulation">
+                                <span>Advanced Options</span>
+                                <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div id="advancedOptions" class="hidden md:block">
+                            <!-- Pinned swimmers section -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Pinned Swimmers (Yellow Highlight)</label>
+                                <div id="highlightedSwimmersContainer" class="flex flex-wrap gap-2 items-center min-h-[24px]"></div>
+                            </div>
+
+                            <!-- View and Column Controls -->
+                            <div class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">View Mode</label>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex items-center"><input id="modeScrolling" name="viewMode" type="radio" value="scrolling" checked class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="toggleViewMode(this.value)"><label for="modeScrolling" class="ml-2 block text-sm">Scrolling</label></div>
+                                        <div class="flex items-center"><input id="modeSingle" name="viewMode" type="radio" value="single" class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="toggleViewMode(this.value)"><label for="modeSingle" class="ml-2 block text-sm">Single Event</label></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="meet-program" class="space-y-6">
+                <!-- Events will be injected here by JavaScript -->
+            </div>
+
+             <!-- Single View Navigation -->
+            <div id="single-view-nav" class="hidden mt-6 flex justify-between items-center">
+                <button id="prevEventBtn" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation">Previous Event</button>
+                <span id="event-counter" class="text-sm font-medium text-gray-600"></span>
+                <button id="nextEventBtn" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation">Next Event</button>
+            </div>
+        </div>
+
+        <!-- Records & All-Stars Content -->
+        <div id="Records" class="content hidden">
+            <div id="records-container" class="space-y-8">
+                 <!-- Records will be injected here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Team Color Key Modal -->
+    <div id="team-key-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+            <h3 class="text-lg font-semibold mb-4">Team Color Key</h3>
+            <div class="space-y-3">
+                <div class="flex items-center"><div class="w-5 h-5 rounded-full mr-3 border border-gray-200" style="background-color: #fee2e2;"></div><span class="text-sm md:text-base">Rock Creek (RC) - Red</span></div>
+                <div class="flex items-center"><div class="w-5 h-5 rounded-full mr-3 border border-gray-200" style="background-color: #dbeafe;"></div><span class="text-sm md:text-base" style="color: #1e40af;">CCR Stingrays - Blue</span></div>
+                <div class="flex items-center"><div class="w-5 h-5 rounded-full mr-3 border border-gray-200" style="background-color: #e2e8f0;"></div><span class="text-sm md:text-base" style="color: #172554;">NCC Sharks - Navy</span></div>
+            </div>
+            <button onclick="toggleTeamKeyModal()" class="mt-6 w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 touch-manipulation">Close</button>
+        </div>
+    </div>
+
+    <!-- Help FAB -->
+    <button onclick="toggleTeamKeyModal()" class="fixed bottom-6 right-6 bg-red-600 text-white rounded-full p-4 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 z-30 touch-manipulation">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    </button>
+
+<script src="meetData.js"></script>
+<script>
+    // --- STATE MANAGEMENT ---
+    let pinnedSwimmers = [];
+    const allUniqueSwimmers = new Set();
+    let viewMode = 'scrolling';
+    let currentEventIndex = 0;
+    let visibleColumns = { lane: true, age: true, seed: true };
+    let searchMode = 'search'; // 'search' or 'pin'
+
+    // --- UI AND EVENT HANDLING ---
+
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-link");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+    }
+
+    function getTeamColors(team) {
+        if (team.startsWith('RC')) return { textColor: 'text-red-700', bgColor: 'bg-red-50' };
+        if (team.startsWith('CA')) return { textColor: 'text-blue-700', bgColor: 'bg-blue-50' };
+        if (team.startsWith('GP')) return { textColor: 'text-slate-800', bgColor: 'bg-slate-100' };
+        if (team.startsWith('DV')) return { textColor: 'text-green-800', bgColor: 'bg-green-50' };
+        if (team.startsWith('HA')) return { textColor: 'text-orange-800', bgColor: 'bg-orange-50' };
+        if (team.startsWith('TW')) return { textColor: 'text-indigo-800', bgColor: 'bg-indigo-50' };
+        return { textColor: 'text-gray-700', bgColor: 'bg-gray-50' };
+    }
+
+    function populateMeetProgram() {
+        const container = document.getElementById('meet-program');
+        const eventJump = document.getElementById('eventJump');
+        container.innerHTML = ''; 
+        eventJump.innerHTML = '<option value="">Select an event to jump to...</option>';
+
+        meetData.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event-card bg-white rounded-xl shadow-md overflow-hidden';
+            eventElement.id = `event-${event.eventNumber}`;
+
+            const eventHeader = document.createElement('div');
+            eventHeader.className = 'event-header bg-gray-100 p-4 border-b border-gray-200';
+            eventHeader.innerHTML = `<h2 class="text-lg font-semibold text-gray-800">#${event.eventNumber} ${event.eventName}</h2>`;
+            eventElement.appendChild(eventHeader);
+            
+            const heatsContainer = document.createElement('div');
+            heatsContainer.className = 'divide-y divide-gray-200';
+
+            event.heats.forEach(heat => {
+                const heatElement = document.createElement('div');
+                heatElement.className = 'heat p-4';
+                heatElement.innerHTML = `<h3 class="font-semibold text-gray-600 mb-3">Heat ${heat.heatNumber} of ${event.heats.length}</h3>`;
+                
+                const headerRow = document.createElement('div');
+                headerRow.className = 'hidden md:grid grid-cols-12 gap-2 items-center text-xs font-semibold text-gray-500 uppercase px-2 mb-2';
+                headerRow.innerHTML = `
+                    <div data-col="lane" class="col-span-1">Lane</div>
+                    <div class="col-span-7">Swimmer</div>
+                    <div data-col="age" class="col-span-2 text-right">Age</div>
+                    <div data-col="seed" class="col-span-2 text-right">Seed</div>
+                `;
+                heatElement.appendChild(headerRow);
+
+                const table = document.createElement('div');
+                table.className = 'space-y-2';
+
+                heat.swimmers.forEach(swimmer => {
+                    const colors = getTeamColors(swimmer.team);
+                    const swimmerRow = document.createElement('div');
+                    swimmerRow.className = `swimmer-row bg-white md:grid md:grid-cols-12 md:gap-2 md:items-center text-sm p-3 md:p-2 rounded-md border border-gray-200 md:border-0 md:${colors.bgColor}`;
+                    swimmerRow.dataset.swimmerName = swimmer.name;
+                    swimmerRow.innerHTML = `
+                        <div data-col="lane" class="swimmer-lane md:col-span-1 font-bold text-gray-500 text-xs md:text-sm">${swimmer.lane || 'N/A'}</div>
+                        <div class="swimmer-name md:col-span-7 font-semibold ${colors.textColor} text-base md:text-sm">${swimmer.name}</div>
+                        <div class="swimmer-details md:contents">
+                            <div data-col="age" class="md:col-span-2 md:text-right font-medium text-gray-600 text-sm">${swimmer.age}</div>
+                            <div data-col="seed" class="md:col-span-2 md:text-right font-mono font-semibold text-gray-700 text-sm">${swimmer.seedTime}</div>
+                        </div>
+                    `;
+                    table.appendChild(swimmerRow);
+                });
+                heatElement.appendChild(table);
+                heatsContainer.appendChild(heatElement);
+            });
+            eventElement.appendChild(heatsContainer);
+            container.appendChild(eventElement);
+            
+            const option = document.createElement('option');
+            option.value = event.eventNumber;
+            option.textContent = `#${event.eventNumber} ${event.eventName}`;
+            eventJump.appendChild(option);
+        });
+        updateColumnVisibility();
+        updateView();
+    }
+
+    function populateRecords() {
+        const container = document.getElementById('records-container');
+        container.innerHTML = '';
+        meetData.forEach(event => {
+            if (!event.records || event.records.length === 0) return;
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-md overflow-hidden';
+            card.innerHTML = `<h3 class="text-lg font-semibold p-4 bg-gray-100 border-b">#${event.eventNumber} ${event.eventName}</h3>`;
+            const tableContainer = document.createElement('div');
+            tableContainer.className = 'p-4 overflow-x-auto';
+            const table = document.createElement('table');
+            table.className = 'w-full text-sm text-left';
+            const tbody = document.createElement('tbody');
+            tbody.className = 'divide-y divide-gray-200';
+            event.records.forEach(record => {
+                const row = document.createElement('tr');
+                const isAllStar = record.type.includes('ALL*');
+                row.className = isAllStar ? 'font-bold bg-red-50' : '';
+                row.innerHTML = `
+                    <td class="py-3 pr-3 font-medium ${isAllStar ? 'text-red-700' : 'text-gray-600'}">${record.type}</td>
+                    <td class="py-3 px-3 font-mono font-semibold ${isAllStar ? 'text-red-800' : 'text-gray-900'}">${record.time}</td>
+                    <td class="py-3 pl-3 text-gray-700">${record.swimmer || ''}</td>
+                    <td class="py-3 pl-3 text-gray-500 text-right">${record.date || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            tableContainer.appendChild(table);
+            card.appendChild(tableContainer);
+            container.appendChild(card);
+        });
+    }
+
+    function searchSwimmers() {
+        const filter = document.getElementById('swimmerSearch').value.toUpperCase();
+        const eventCards = document.querySelectorAll('#meet-program .event-card');
+        
+        eventCards.forEach(card => {
+            const swimmers = card.querySelectorAll('.swimmer-row');
+            let eventHasMatch = false;
+            swimmers.forEach(swimmer => {
+                const name = swimmer.dataset.swimmerName.toUpperCase();
+                const isMatch = name.includes(filter);
+                if (isMatch) {
+                    swimmer.classList.remove('hidden');
+                    swimmer.classList.add('search-highlight');
+                    eventHasMatch = true;
+                } else {
+                    swimmer.classList.add('hidden');
+                    swimmer.classList.remove('search-highlight');
+                }
+            });
+            if (eventHasMatch || filter === '') {
+                 card.style.display = '';
+            } else {
+                 card.style.display = 'none';
+            }
+        });
+        
+        // Clear search highlights if no filter
+        if (filter === '') {
+            document.querySelectorAll('.swimmer-row').forEach(row => {
+                row.classList.remove('search-highlight');
+            });
+        }
+        
+        applyPinHighlighting();
+    }
+
+    function updateSearchMode() {
+        const searchModeInput = document.querySelector('input[name="searchMode"]:checked').value;
+        searchMode = searchModeInput;
+        const searchInput = document.getElementById('swimmerSearch');
+        
+        if (searchMode === 'search') {
+            searchInput.placeholder = 'Search swimmers...';
+            // Clear any existing search and hide options
+            searchInput.value = '';
+            document.getElementById('searchOptions').classList.add('hidden');
+            // Clear search highlights and show all swimmers
+            document.querySelectorAll('.swimmer-row').forEach(row => {
+                row.classList.remove('hidden', 'search-highlight');
+            });
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.style.display = '';
+            });
+        } else {
+            searchInput.placeholder = 'Select swimmers to pin...';
+            // Clear search
+            searchInput.value = '';
+            document.getElementById('searchOptions').classList.add('hidden');
+            // Clear search highlights and show all swimmers
+            document.querySelectorAll('.swimmer-row').forEach(row => {
+                row.classList.remove('hidden', 'search-highlight');
+            });
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.style.display = '';
+            });
+        }
+        applyPinHighlighting();
+    }
+
+    function handleCombinedSearch() {
+        if (searchMode === 'search') {
+            searchSwimmers();
+        } else {
+            filterSearchOptions({ target: document.getElementById('swimmerSearch') });
+        }
+    }
+
+    function showSearchOptions() {
+        if (searchMode === 'pin') {
+            filterSearchOptions({ target: document.getElementById('swimmerSearch') });
+        }
+    }
+
+    function filterSearchOptions(event) {
+        const filter = event.target.value.toUpperCase();
+        const optionsContainer = document.getElementById('searchOptions');
+        optionsContainer.innerHTML = '';
+        const filteredSwimmers = [...allUniqueSwimmers]
+            .filter(name => name.toUpperCase().includes(filter) && !pinnedSwimmers.includes(name))
+            .sort();
+        if (filteredSwimmers.length > 0) {
+            filteredSwimmers.forEach(name => {
+                const option = document.createElement('div');
+                option.className = 'p-2 hover:bg-gray-100 cursor-pointer text-sm';
+                option.textContent = name;
+                option.onmousedown = () => togglePin(name);
+                optionsContainer.appendChild(option);
+            });
+            optionsContainer.classList.remove('hidden');
+        } else {
+            optionsContainer.classList.add('hidden');
+        }
+    }
+    
+    function jumpToEvent() {
+        const select = document.getElementById('eventJump');
+        const eventNumber = select.value;
+        if (!eventNumber) return;
+
+        const eventCards = document.querySelectorAll('#meet-program .event-card');
+        const targetIndex = Array.from(eventCards).findIndex(card => card.id === `event-${eventNumber}`);
+
+        if (targetIndex !== -1) {
+            currentEventIndex = targetIndex;
+            updateView(); // This will handle showing the correct event and scrolling
+        }
+    }
+    
+    // --- NEW VIEW AND COLUMN FUNCTIONS ---
+
+    function toggleViewMode(mode) {
+        viewMode = mode;
+        const jumpSelect = document.getElementById('eventJump');
+        if (viewMode === 'single') {
+            jumpSelect.value = meetData[currentEventIndex].eventNumber;
+        } else {
+            jumpSelect.value = "";
+        }
+        updateView();
+    }
+
+    function updateView() {
+        const eventCards = document.querySelectorAll('#meet-program .event-card');
+        const nav = document.getElementById('single-view-nav');
+        const counter = document.getElementById('event-counter');
+        
+        if (viewMode === 'scrolling') {
+            eventCards.forEach(card => card.classList.remove('hidden-by-view'));
+            nav.classList.add('hidden');
+        } else { // Single view
+            eventCards.forEach((card, index) => {
+                if (index === currentEventIndex) {
+                    card.classList.remove('hidden-by-view');
+                } else {
+                    card.classList.add('hidden-by-view');
+                }
+            });
+            nav.classList.remove('hidden');
+            counter.textContent = `Event ${currentEventIndex + 1} of ${eventCards.length}`;
+            document.getElementById('prevEventBtn').disabled = currentEventIndex === 0;
+            document.getElementById('nextEventBtn').disabled = currentEventIndex === eventCards.length - 1;
+
+            // Scroll to the single event
+            const targetElement = eventCards[currentEventIndex];
+            if(targetElement) {
+                const headerOffset = document.getElementById('controlsContainer').offsetHeight + 20;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+        }
+    }
+
+    function toggleColumn(colName, isVisible) {
+        visibleColumns[colName] = isVisible;
+        updateColumnVisibility();
+    }
+
+    function updateColumnVisibility() {
+        for (const colName in visibleColumns) {
+            const elements = document.querySelectorAll(`[data-col="${colName}"]`);
+            if (visibleColumns[colName]) {
+                elements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                elements.forEach(el => el.classList.add('hidden'));
+            }
+        }
+        
+        // Adjust name column span based on what's hidden
+        const nameCols = document.querySelectorAll('.swimmer-row .col-span-7');
+        let hiddenCount = 0;
+        if (!visibleColumns.age) hiddenCount++;
+        if (!visibleColumns.seed) hiddenCount++;
+        
+        nameCols.forEach(el => {
+            el.classList.remove('md:col-span-7', 'md:col-span-9', 'md:col-span-11');
+            if(hiddenCount === 1) {
+                el.classList.add('md:col-span-9');
+            } else if (hiddenCount === 2) {
+                el.classList.add('md:col-span-11');
+            }
+            else {
+                el.classList.add('md:col-span-7');
+            }
+        });
+    }
+    
+    function toggleTeamKeyModal() {
+        document.getElementById('team-key-modal').classList.toggle('hidden');
+    }
+
+    // --- PINNING FUNCTIONS (Largely unchanged) ---
+    function updatePinnedSwimmersUI() {
+        const container = document.getElementById('highlightedSwimmersContainer');
+        container.innerHTML = '';
+        if (pinnedSwimmers.length === 0) {
+            container.innerHTML = '<span class="text-xs text-gray-500 px-1">No swimmers pinned.</span>';
+            return;
+        }
+        pinnedSwimmers.sort().forEach(name => {
+            const tag = document.createElement('span');
+            tag.className = 'bg-red-100 text-red-800 text-sm font-medium px-2.5 py-1 rounded-full flex items-center';
+            tag.innerHTML = `${name}<button onclick="togglePin('${name}')" class="ml-2 text-red-600 hover:text-red-800 font-bold">&times;</button>`;
+            container.appendChild(tag);
+        });
+    }
+
+    function applyPinHighlighting() {
+        document.querySelectorAll('.swimmer-row').forEach(row => {
+            if (pinnedSwimmers.includes(row.dataset.swimmerName)) {
+                row.classList.add('pin-highlight');
+            } else {
+                row.classList.remove('pin-highlight');
+            }
+        });
+    }
+
+    function togglePin(name) {
+        const index = pinnedSwimmers.indexOf(name);
+        if (index > -1) pinnedSwimmers.splice(index, 1);
+        else pinnedSwimmers.push(name);
+        updatePinnedSwimmersUI();
+        applyPinHighlighting();
+        document.getElementById('swimmerSearch').value = '';
+        document.getElementById('searchOptions').classList.add('hidden');
+    }
+
+    function showHighlightOptions() {
+        // This function is kept for backward compatibility but now uses the combined search
+        if (searchMode === 'pin') {
+            showSearchOptions();
+        }
+    }
+
+    function filterHighlightOptions(event) {
+        // This function is kept for backward compatibility but now uses the combined search
+        if (searchMode === 'pin') {
+            filterSearchOptions(event);
+        }
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        meetData.forEach(event => event.heats.forEach(heat => heat.swimmers.forEach(swimmer => {
+            if (swimmer.name) allUniqueSwimmers.add(swimmer.name);
+        })));
+
+        populateMeetProgram();
+        populateRecords();
+        updatePinnedSwimmersUI();
+
+        document.querySelector('.tab-link').click();
+
+        // Auto-collapse controls on mobile
+        const controlsContent = document.getElementById('controlsContent');
+        if (window.innerWidth < 768) {
+            controlsContent.classList.add('hidden');
+        }
+
+        // Mobile advanced options toggle
+        const mobileAdvancedToggle = document.getElementById('mobileAdvancedToggle');
+        const advancedOptions = document.getElementById('advancedOptions');
+        if (mobileAdvancedToggle) {
+            mobileAdvancedToggle.addEventListener('click', () => {
+                advancedOptions.classList.toggle('hidden');
+                const svg = mobileAdvancedToggle.querySelector('svg');
+                svg.classList.toggle('rotate-180');
+            });
+        }
+
+        const toggleBtn = document.getElementById('toggleControlsBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        toggleBtn.addEventListener('click', () => {
+            controlsContent.classList.toggle('hidden');
+            toggleIcon.innerHTML = controlsContent.classList.contains('hidden') 
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('controlsContainer').contains(event.target)) {
+                document.getElementById('searchOptions').classList.add('hidden');
+            }
+            if (event.target === document.getElementById('team-key-modal')) {
+                toggleTeamKeyModal();
+            }
+        });
+
+        document.getElementById('prevEventBtn').addEventListener('click', () => {
+            if (currentEventIndex > 0) {
+                currentEventIndex--;
+                updateView();
+            }
+        });
+        document.getElementById('nextEventBtn').addEventListener('click', () => {
+            const eventCount = document.querySelectorAll('#meet-program .event-card').length;
+            if (currentEventIndex < eventCount - 1) {
+                currentEventIndex++;
+                updateView();
+            }
+        });
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                updateView();
+            }, 100);
+        });
+
+        // Improve touch experience
+        document.addEventListener('touchstart', function() {}, { passive: true });
+    });
+
+</script>
+
+</body>
+</html>
