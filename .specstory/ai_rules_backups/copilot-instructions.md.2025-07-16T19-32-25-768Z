@@ -1,0 +1,107 @@
+
+## PROJECT RULES, CODING STANDARDS, WORKFLOW GUIDELINES, REFERENCES, DOCUMENTATION STRUCTURES, AND BEST PRACTICES
+
+This file serves as the central source of truth for all project-related rules, coding standards, workflow guidelines, architectural decisions, references, documentation structures, and best practices. All AI coding assistants interacting with this project MUST adhere to the guidelines outlined in this document.
+
+## HEADERS
+
+### PROJECT GOALS & OBJECTIVES
+
+*   Define the overarching goals of the project.
+*   Outline specific, measurable, achievable, relevant, and time-bound (SMART) objectives.
+
+### TECH STACK
+
+*   Programming languages: [Specify languages used]
+*   Frameworks: [Specify frameworks used]
+*   Libraries: [Specify libraries used]
+*   Databases: [Specify databases used]
+*   Tools: [Specify tools used]
+*   Infrastructure: [Specify infrastructure details]
+
+### PROJECT ARCHITECTURE
+
+*   High-level system architecture.
+*   Module breakdown and dependencies.
+*   Data flow diagrams.
+*   API specifications.
+
+### CODING STANDARDS
+
+*   **General:**
+    *   Adhere to established coding conventions (e.g., PEP 8 for Python, Google Style Guide for C++).
+    *   Write clean, readable, and well-documented code.
+    *   Use meaningful variable and function names.
+    *   Keep functions short and focused.
+    *   Avoid code duplication (DRY principle).
+*   **Specific Languages:**
+    *   [Language-specific coding standards, e.g., Python, JavaScript, etc.]
+*   **Version Control:**
+    *   Use clear and concise commit messages.
+    *   Follow a consistent branching strategy (e.g., Gitflow).
+    *   Code reviews are mandatory before merging changes.
+
+### WORKFLOW & RELEASE RULES
+
+*   Agile development methodologies (e.g., Scrum, Kanban).
+*   Issue tracking and project management tools (e.g., Jira, Trello).
+*   Continuous integration and continuous deployment (CI/CD) pipelines.
+*   Release management procedures.
+
+### TESTING
+
+*   Unit testing: Write unit tests for all critical components.
+*   Integration testing: Verify the interaction between different modules.
+*   End-to-end testing: Test the entire system from the user's perspective.
+*   Test-driven development (TDD): Consider adopting TDD for new features.
+
+### DEBUGGING
+
+*   Use debugging tools and techniques effectively.
+*   Write comprehensive error messages.
+*   Log important events and data for debugging purposes.
+*   Implement proper error handling and exception handling.
+*   When debugging CSS issues, pay close attention to class names and ensure they are correctly formed and not malformed (e.g., `hidden_ by_default` should be `hidden`).
+*   When debugging CSS issues, ensure that all required CSS rules are present, particularly for hiding/showing elements (e.g., `.hidden-by-view { display: none !important; }`).
+*   When debugging JavaScript issues, ensure that both CSS classes and inline styles are used for better reliability.
+
+### PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+*   **Code Documentation:**
+    *   Document all classes, functions, and modules with clear and concise comments.
+    *   Generate API documentation using tools like Sphinx or JSDoc.
+*   **Technical Documentation:**
+    *   Maintain a comprehensive technical documentation explaining the system architecture, design decisions, and implementation details.
+*   **User Documentation:**
+    *   Provide user manuals and tutorials for end-users.
+*   **Project README:**
+    *   Include a detailed README file with instructions on how to set up, build, and run the project.
+
+### REFERENCES
+
+*   Links to relevant documentation, articles, and resources.
+*   Style guides.
+*   API documentation.
+
+### BEST PRACTICES
+
+*   Security: Implement security best practices to protect against vulnerabilities.
+*   Performance: Optimize code for performance and scalability.
+*   Accessibility: Ensure the application is accessible to users with disabilities.
+*   Maintainability: Write code that is easy to maintain and update.
+*   When dealing with column visibility, ensure that the correct elements are tagged with `data-col` attributes.
+*   Ensure that the column visibility logic accounts for all possible hidden columns and dynamically adjusts the layout accordingly.
+*   When implementing view modes (e.g., scrolling vs. single view), use both CSS classes and inline styles for better reliability in hiding/showing elements.
+*   Use `favicon.ico` for the page's favicon, and include a backup shortcut icon link for better browser compatibility.
+*   Combine the "pin" and "filter swimmer search" functionalities into a single search bar with selectable features, using radio buttons to switch between "Search" and "Pin" modes.
+*   Remove "Age:" and "Seed:" labels from heat tables.
+*   Hide "ready" checkboxes in heat tables when the "Ready" column is unchecked.
+*   Center column labels over values for READY in heat tables.
+*   For heat tables:
+    *   The AGE and SEED column names should be right-aligned over the column values.
+    *   The AGE and SEED column values should be right-aligned.
+    *   The READY checkboxes should be center-aligned.
+*   Optimize webpages for mobile.
+*   When including additional files in the site directory on Netlify, consider the following performance implications:
+    *   Unused files (not referenced by HTML, CSS, or JavaScript) do not impact performance.
+    *   Large, unoptimized files can negatively affect performance.

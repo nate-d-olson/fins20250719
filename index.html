@@ -2,12 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="MCSL Division H Championship Meet Program - July 19, 2025">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MCSL Div H">
+    <link rel="manifest" href="manifest.json">
     <title>MCSL Division H Divisionals</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="fins_logo.png">
+    <!-- Performance improvements -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -63,17 +75,24 @@
         @media (max-width: 768px) {
             .swimmer-row {
                 display: block !important;
-                padding: 12px !important;
-                margin-bottom: 8px;
+                padding: 16px !important;
+                margin-bottom: 12px;
                 background: inherit !important;
                 border: 1px solid #e5e7eb !important;
-                border-radius: 8px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+                transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+            }
+            
+            .swimmer-row:active {
+                transform: translateY(1px) !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
             }
             
             .swimmer-row > div {
                 display: block !important;
                 width: 100% !important;
-                margin-bottom: 4px;
+                margin-bottom: 6px;
             }
             
             .swimmer-row > div:last-child {
@@ -81,9 +100,11 @@
             }
             
             .swimmer-name {
-                font-size: 16px !important;
+                font-size: 18px !important;
                 font-weight: 600 !important;
-                margin-bottom: 8px !important;
+                margin-bottom: 12px !important;
+                line-height: 1.3 !important;
+                color: #1f2937 !important;
             }
             
             .swimmer-details {
@@ -91,25 +112,27 @@
                 justify-content: space-between !important;
                 align-items: center !important;
                 flex-wrap: wrap !important;
-                gap: 8px !important;
+                gap: 12px !important;
+                font-size: 16px !important;
             }
             
             .swimmer-ready {
                 display: flex !important;
                 justify-content: center !important;
-                margin-top: 8px !important;
+                margin-top: 12px !important;
             }
             
             .swimmer-ready input[type="checkbox"] {
-                width: 20px !important;
-                height: 20px !important;
+                width: 24px !important;
+                height: 24px !important;
                 appearance: none !important;
                 -webkit-appearance: none !important;
                 border: 2px solid #d1d5db !important;
-                border-radius: 4px !important;
+                border-radius: 6px !important;
                 background-color: white !important;
                 cursor: pointer !important;
                 position: relative !important;
+                margin: 8px !important;
             }
             
             .swimmer-ready input[type="checkbox"]:checked {
@@ -124,7 +147,7 @@
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
                 color: white !important;
-                font-size: 14px !important;
+                font-size: 16px !important;
                 font-weight: bold !important;
             }
             
@@ -134,18 +157,21 @@
             }
             
             .heat h3 {
-                font-size: 14px !important;
-                margin-bottom: 12px !important;
+                font-size: 16px !important;
+                margin-bottom: 16px !important;
+                font-weight: 600 !important;
+                color: #1f2937 !important;
             }
             
             /* Make controls container more accessible on mobile */
             #controlsContainer {
-                position: fixed !important;
+                position: sticky !important;
                 top: 120px !important;
                 left: 0 !important;
                 right: 0 !important;
-                margin: 0 8px !important;
-                z-index: 50 !important;
+                margin: 0 0 20px 0 !important;
+                z-index: 40 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
             }
             
             /* Add top margin to content to account for fixed controls */
@@ -167,31 +193,113 @@
             
             body {
                 -webkit-text-size-adjust: 100%;
+                font-size: 16px;
+                line-height: 1.5;
             }
             
             /* Improve tap targets */
             button, input, select, textarea {
-                min-height: 44px;
+                min-height: 48px;
+                font-size: 16px;
             }
             
             /* Better focus states for mobile */
             input:focus, select:focus, textarea:focus {
                 outline: none;
-                box-shadow: 0 0 0 2px #dc2626;
+                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+                border-color: #dc2626;
+            }
+            
+            /* Improve button spacing */
+            button {
+                margin: 4px;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-weight: 500;
+            }
+            
+            /* Better search dropdown for mobile */
+            #searchOptions {
+                max-height: 200px;
+                border-radius: 8px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            }
+            
+            /* Mobile-specific animations */
+            .mobile-fade-in {
+                animation: mobileSlideIn 0.3s ease-out;
+            }
+            
+            @keyframes mobileSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
         }
 
         /* Improved pinned swimmer tags for mobile */
         @media (max-width: 768px) {
             .bg-red-100 {
-                padding: 8px 12px;
-                font-size: 14px;
+                padding: 12px 16px;
+                font-size: 16px;
+                border-radius: 8px;
+                margin: 4px;
+                display: inline-flex;
+                align-items: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
             
             .bg-red-100 button {
-                margin-left: 8px;
-                font-size: 18px;
+                margin-left: 12px;
+                font-size: 20px;
                 line-height: 1;
+                padding: 4px;
+                min-height: 32px;
+                min-width: 32px;
+                border-radius: 50%;
+                background-color: rgba(220, 38, 38, 0.1);
+                color: #dc2626;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .bg-red-100 button:hover {
+                background-color: rgba(220, 38, 38, 0.2);
+            }
+            
+            /* Floating Action Button improvements */
+            .floating-btn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background-color: #dc2626;
+                color: white;
+                border: none;
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 1000;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .floating-btn:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
+            }
+            
+            .floating-btn:active {
+                transform: scale(0.95);
             }
         }
     </style>
@@ -793,7 +901,133 @@
 
         // Improve touch experience
         document.addEventListener('touchstart', function() {}, { passive: true });
+        
+        // Register service worker for better mobile performance
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+        
+        // Mobile-specific improvements
+        if (window.innerWidth < 768) {
+            // Add mobile-specific enhancements
+            addMobileEnhancements();
+        }
+        
+        // Add resize handler for responsive adjustments
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (window.innerWidth < 768) {
+                    addMobileEnhancements();
+                } else {
+                    removeMobileEnhancements();
+                }
+            }, 250);
+        });
     });
+
+    // Mobile enhancement functions
+    function addMobileEnhancements() {
+        // Add pull-to-refresh feel (visual feedback only)
+        let startY = 0;
+        let currentY = 0;
+        let pullDistance = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (window.scrollY === 0 && startY) {
+                currentY = e.touches[0].clientY;
+                pullDistance = currentY - startY;
+                
+                if (pullDistance > 0 && pullDistance < 100) {
+                    document.body.style.transform = `translateY(${pullDistance * 0.5}px)`;
+                    document.body.style.transition = 'none';
+                }
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', () => {
+            document.body.style.transform = '';
+            document.body.style.transition = 'transform 0.3s ease-out';
+            startY = 0;
+            pullDistance = 0;
+        }, { passive: true });
+        
+        // Add haptic feedback simulation
+        function addHapticFeedback(element) {
+            element.addEventListener('touchstart', () => {
+                element.style.transform = 'scale(0.98)';
+                element.style.transition = 'transform 0.1s ease';
+            }, { passive: true });
+            
+            element.addEventListener('touchend', () => {
+                element.style.transform = 'scale(1)';
+            }, { passive: true });
+        }
+        
+        // Apply to buttons and interactive elements
+        document.querySelectorAll('button, .swimmer-row, input[type="checkbox"]').forEach(addHapticFeedback);
+        
+        // Optimize scrolling performance
+        let ticking = false;
+        function updateScrolling() {
+            // Add scroll-based optimizations here
+            ticking = false;
+        }
+        
+        document.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateScrolling);
+                ticking = true;
+            }
+        }, { passive: true });
+        
+        // Add swipe gestures for navigation
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeThreshold = 100;
+            const swipeDistance = touchEndX - touchStartX;
+            
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance > 0) {
+                    // Swipe right - could trigger previous action
+                    console.log('Swiped right');
+                } else {
+                    // Swipe left - could trigger next action
+                    console.log('Swiped left');
+                }
+            }
+        }
+    }
+    
+    function removeMobileEnhancements() {
+        // Clean up mobile-specific event listeners if needed
+        document.body.style.transform = '';
+        document.body.style.transition = '';
+    }
 
 </script>
 
