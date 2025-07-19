@@ -333,6 +333,30 @@
             padding: 0;
             margin-left: 2px;
         }
+        
+        /* Wrangler mode styles */
+        .wrangler-crossed-out {
+            text-decoration: line-through !important;
+            opacity: 0.6 !important;
+            background-color: #f3f4f6 !important;
+            border-left: 4px solid #9ca3af !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .wrangler-mode .swimmer-row {
+            cursor: pointer !important;
+            user-select: none !important;
+        }
+        
+        .wrangler-mode .swimmer-row:hover:not(.wrangler-crossed-out) {
+            background-color: #fef3c7 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wrangler-mode .swimmer-name {
+            transition: text-decoration 0.3s ease, opacity 0.3s ease !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -417,6 +441,14 @@
                             <div class="flex bg-gray-50 rounded-md p-0.5">
                                 <button id="scrollingViewBtn" class="px-3 py-1 text-xs rounded bg-white shadow-sm" onclick="toggleViewMode('scrolling')">All</button>
                                 <button id="singleViewBtn" class="px-3 py-1 text-xs rounded text-gray-600" onclick="toggleViewMode('single')">One</button>
+                                <button id="wranglerViewBtn" class="px-3 py-1 text-xs rounded text-gray-600" onclick="toggleViewMode('wrangler')">Wrangler</button>
+                            </div>
+                        </div>
+                        <!-- Wrangler mode controls -->
+                        <div id="wranglerControls" class="mt-2 hidden">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Tap swimmers to cross out</span>
+                                <button onclick="clearAllCrossedOut()" class="px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors">Clear All</button>
                             </div>
                         </div>
                     </div>
@@ -472,6 +504,7 @@
     let currentEventIndex = 0;
     let visibleColumns = { lane: true, age: true, seed: true };
     let searchMode = 'search'; // 'search' or 'pin'
+    let crossedOutSwimmers = new Set(); // Track crossed-out swimmers in wrangler mode
 
     // --- UI AND EVENT HANDLING ---
 
@@ -592,6 +625,13 @@
                     // Apply mobile team colors
                     swimmerRow.style.setProperty('--mobile-bg', colors.mobileBg);
                     swimmerRow.style.setProperty('--mobile-border', colors.mobileBorder);
+                    
+                    // Add click handler for wrangler mode
+                    swimmerRow.addEventListener('click', function() {
+                        if (viewMode === 'wrangler') {
+                            toggleSwimmerCrossedOut(swimmer.name);
+                        }
+                    });
                     
                     swimmerRow.innerHTML = `
                         <div data-col="lane" class="swimmer-lane md:col-span-1 font-bold text-gray-500 text-xs md:text-sm">${swimmer.lane || 'N/A'}</div>
@@ -816,6 +856,38 @@
     function toggleViewMode(mode) {
         viewMode = mode;
         const jumpSelect = document.getElementById('eventJump');
+        const meetProgram = document.getElementById('meet-program');
+        const wranglerControls = document.getElementById('wranglerControls');
+        
+        // Update button styles
+        const scrollingBtn = document.getElementById('scrollingViewBtn');
+        const singleBtn = document.getElementById('singleViewBtn');
+        const wranglerBtn = document.getElementById('wranglerViewBtn');
+        
+        // Reset all button styles
+        [scrollingBtn, singleBtn, wranglerBtn].forEach(btn => {
+            btn.classList.remove('bg-white', 'shadow-sm');
+            btn.classList.add('text-gray-600');
+        });
+        
+        // Set active button style and show/hide controls
+        if (mode === 'scrolling') {
+            scrollingBtn.classList.add('bg-white', 'shadow-sm');
+            scrollingBtn.classList.remove('text-gray-600');
+            meetProgram.classList.remove('wrangler-mode');
+            wranglerControls.classList.add('hidden');
+        } else if (mode === 'single') {
+            singleBtn.classList.add('bg-white', 'shadow-sm');
+            singleBtn.classList.remove('text-gray-600');
+            meetProgram.classList.remove('wrangler-mode');
+            wranglerControls.classList.add('hidden');
+        } else if (mode === 'wrangler') {
+            wranglerBtn.classList.add('bg-white', 'shadow-sm');
+            wranglerBtn.classList.remove('text-gray-600');
+            meetProgram.classList.add('wrangler-mode');
+            wranglerControls.classList.remove('hidden');
+        }
+        
         if (viewMode === 'single') {
             jumpSelect.value = meetData[currentEventIndex].eventNumber;
         } else {
@@ -829,7 +901,8 @@
         const nav = document.getElementById('single-view-nav');
         const counter = document.getElementById('event-counter');
         
-        if (viewMode === 'scrolling') {
+        if (viewMode === 'scrolling' || viewMode === 'wrangler') {
+            // Both scrolling and wrangler modes show all events
             eventCards.forEach(card => card.classList.remove('hidden-by-view'));
             nav.classList.add('hidden');
         } else { // Single view
@@ -853,6 +926,11 @@
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                 window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
             }
+        }
+        
+        // Apply crossed-out states in wrangler mode
+        if (viewMode === 'wrangler') {
+            applyCrossedOutStates();
         }
     }
 
@@ -941,6 +1019,32 @@
         if (searchMode === 'pin') {
             filterSearchOptions(event);
         }
+    }
+
+    // --- WRANGLER MODE FUNCTIONS ---
+    function toggleSwimmerCrossedOut(swimmerName) {
+        if (crossedOutSwimmers.has(swimmerName)) {
+            crossedOutSwimmers.delete(swimmerName);
+        } else {
+            crossedOutSwimmers.add(swimmerName);
+        }
+        applyCrossedOutStates();
+    }
+
+    function applyCrossedOutStates() {
+        document.querySelectorAll('.swimmer-row').forEach(row => {
+            const swimmerName = row.dataset.swimmerName;
+            if (crossedOutSwimmers.has(swimmerName)) {
+                row.classList.add('wrangler-crossed-out');
+            } else {
+                row.classList.remove('wrangler-crossed-out');
+            }
+        });
+    }
+
+    function clearAllCrossedOut() {
+        crossedOutSwimmers.clear();
+        applyCrossedOutStates();
     }
 
     // --- INITIALIZATION ---
