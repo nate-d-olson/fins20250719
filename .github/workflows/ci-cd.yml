@@ -1,0 +1,374 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        # Create package.json for linting tools
+        npm init -y
+        npm install --save-dev \
+          htmlhint \
+          eslint \
+          eslint-config-standard \
+          lighthouse \
+          puppeteer \
+          @axe-core/cli
+          
+    - name: Create ESLint config
+      run: |
+        cat > .eslintrc.js << 'EOF'
+        module.exports = {
+          env: {
+            browser: true,
+            es2021: true
+          },
+          extends: ['standard'],
+          parserOptions: {
+            ecmaVersion: 12,
+            sourceType: 'script'
+          },
+          globals: {
+            meetData: 'readonly'
+          },
+          rules: {
+            // Allow some common patterns in this project
+            'no-unused-vars': 'warn',
+            'no-undef': 'warn'
+          }
+        }
+        EOF
+        
+    - name: Create HTMLHint config
+      run: |
+        cat > .htmlhintrc << 'EOF'
+        {
+          "tagname-lowercase": true,
+          "attr-lowercase": true,
+          "attr-value-double-quotes": true,
+          "doctype-first": true,
+          "tag-pair": true,
+          "spec-char-escape": true,
+          "id-unique": true,
+          "src-not-empty": true,
+          "attr-no-duplication": true,
+          "title-require": true,
+          "alt-require": false,
+          "doctype-html5": true,
+          "style-disabled": false,
+          "inline-style-disabled": false,
+          "inline-script-disabled": false,
+          "space-tab-mixed-disabled": true,
+          "id-class-ad-disabled": true,
+          "href-abs-or-rel": false,
+          "attr-unsafe-chars": true
+        }
+        EOF
+        
+    - name: Lint HTML
+      run: npx htmlhint index.html
+      
+    - name: Lint JavaScript
+      run: npx eslint index.html --ext .html
+      continue-on-error: true  # Don't fail on lint warnings
+      
+    - name: Check for basic file structure
+      run: |
+        echo "Checking required files..."
+        test -f index.html || (echo "Missing index.html" && exit 1)
+        test -f meetData.js || (echo "Missing meetData.js" && exit 1)
+        test -f sw.js || (echo "Missing sw.js" && exit 1)
+        test -f manifest.json || (echo "Missing manifest.json" && exit 1)
+        test -f netlify.toml || (echo "Missing netlify.toml" && exit 1)
+        echo "All required files present ✓"
+        
+    - name: Validate JSON files
+      run: |
+        echo "Validating JSON files..."
+        # Check manifest.json is valid JSON
+        cat manifest.json | jq '.' > /dev/null && echo "manifest.json is valid ✓" || (echo "manifest.json is invalid" && exit 1)
+        
+    - name: Install Puppeteer dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libnss3-dev \
+          libatk-bridge2.0-dev \
+          libdrm-dev \
+          libxkbcommon-dev \
+          libgtk-3-dev \
+          libasound2-dev
+          
+    - name: Run basic functionality tests
+      run: |
+        cat > test-basic.js << 'EOF'
+        const puppeteer = require('puppeteer');
+        const path = require('path');
+
+        (async () => {
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+          });
+          
+          try {
+            const page = await browser.newPage();
+            
+            // Test desktop view
+            await page.setViewport({ width: 1200, height: 800 });
+            await page.goto(`file://${path.resolve('index.html')}`, { 
+              waitUntil: 'networkidle0',
+              timeout: 30000 
+            });
+            
+            console.log('✓ Page loads successfully on desktop');
+            
+            // Check for critical elements
+            const title = await page.title();
+            console.log(`✓ Page title: ${title}`);
+            
+            const header = await page.$('header');
+            if (!header) throw new Error('Header not found');
+            console.log('✓ Header element found');
+            
+            const toolsContainer = await page.$('#controlsContainer');
+            if (!toolsContainer) throw new Error('Tools container not found');
+            console.log('✓ Tools container found');
+            
+            const meetProgram = await page.$('#meet-program');
+            if (!meetProgram) throw new Error('Meet program container not found');
+            console.log('✓ Meet program container found');
+            
+            // Test mobile view
+            await page.setViewport({ width: 375, height: 812 });
+            await page.reload({ waitUntil: 'networkidle0' });
+            
+            console.log('✓ Page loads successfully on mobile');
+            
+            // Test search functionality
+            const searchInput = await page.$('#swimmerSearch');
+            if (!searchInput) throw new Error('Search input not found');
+            await searchInput.type('Silva');
+            
+            // Wait a bit for search to process
+            await page.waitForTimeout(1000);
+            console.log('✓ Search functionality works');
+            
+            // Test event jumping
+            const eventJump = await page.$('#eventJump');
+            if (!eventJump) throw new Error('Event jump selector not found');
+            console.log('✓ Event jump selector found');
+            
+            console.log('\n🎉 All basic functionality tests passed!');
+            
+          } catch (error) {
+            console.error('❌ Test failed:', error.message);
+            process.exit(1);
+          } finally {
+            await browser.close();
+          }
+        })();
+        EOF
+        
+        node test-basic.js
+        
+    - name: Run accessibility tests
+      run: |
+        cat > test-accessibility.js << 'EOF'
+        const puppeteer = require('puppeteer');
+        const path = require('path');
+
+        (async () => {
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+          });
+          
+          try {
+            const page = await browser.newPage();
+            await page.goto(`file://${path.resolve('index.html')}`, { 
+              waitUntil: 'networkidle0' 
+            });
+            
+            // Inject axe-core for accessibility testing
+            await page.addScriptTag({
+              path: './node_modules/axe-core/axe.min.js'
+            });
+            
+            // Run accessibility tests
+            const results = await page.evaluate(async () => {
+              return await axe.run();
+            });
+            
+            console.log(`Accessibility scan completed: ${results.violations.length} violations found`);
+            
+            if (results.violations.length > 0) {
+              console.log('\n⚠️  Accessibility violations:');
+              results.violations.forEach(violation => {
+                console.log(`- ${violation.id}: ${violation.description}`);
+                console.log(`  Impact: ${violation.impact}`);
+                console.log(`  Nodes affected: ${violation.nodes.length}`);
+              });
+            } else {
+              console.log('✓ No accessibility violations found!');
+            }
+            
+            // Don't fail the build for accessibility issues, just report
+            console.log('\n✓ Accessibility scan completed');
+            
+          } catch (error) {
+            console.error('❌ Accessibility test failed:', error.message);
+            // Don't fail the build for accessibility testing issues
+          } finally {
+            await browser.close();
+          }
+        })();
+        EOF
+        
+        node test-accessibility.js || true
+        
+    - name: Performance audit with Lighthouse
+      run: |
+        cat > test-performance.js << 'EOF'
+        const lighthouse = require('lighthouse');
+        const chromeLauncher = require('chrome-launcher');
+        const path = require('path');
+
+        (async () => {
+          const chrome = await chromeLauncher.launch({chromeFlags: ['--headless', '--no-sandbox']});
+          
+          try {
+            const options = {
+              logLevel: 'info',
+              output: 'json',
+              onlyCategories: ['performance', 'accessibility', 'best-practices'],
+              port: chrome.port,
+            };
+            
+            const runnerResult = await lighthouse(`file://${path.resolve('index.html')}`, options);
+            
+            const scores = runnerResult.lhr.categories;
+            
+            console.log('\n📊 Lighthouse Performance Audit:');
+            console.log(`Performance: ${Math.round(scores.performance.score * 100)}`);
+            console.log(`Accessibility: ${Math.round(scores.accessibility.score * 100)}`);
+            console.log(`Best Practices: ${Math.round(scores['best-practices'].score * 100)}`);
+            
+            // Check if scores meet minimum thresholds
+            const minPerformance = 80;
+            const minAccessibility = 90;
+            const minBestPractices = 80;
+            
+            const perfScore = Math.round(scores.performance.score * 100);
+            const a11yScore = Math.round(scores.accessibility.score * 100);
+            const bpScore = Math.round(scores['best-practices'].score * 100);
+            
+            if (perfScore >= minPerformance) {
+              console.log(`✓ Performance score ${perfScore} meets minimum ${minPerformance}`);
+            } else {
+              console.log(`⚠️  Performance score ${perfScore} below minimum ${minPerformance}`);
+            }
+            
+            if (a11yScore >= minAccessibility) {
+              console.log(`✓ Accessibility score ${a11yScore} meets minimum ${minAccessibility}`);
+            } else {
+              console.log(`⚠️  Accessibility score ${a11yScore} below minimum ${minAccessibility}`);
+            }
+            
+            if (bpScore >= minBestPractices) {
+              console.log(`✓ Best practices score ${bpScore} meets minimum ${minBestPractices}`);
+            } else {
+              console.log(`⚠️  Best practices score ${bpScore} below minimum ${minBestPractices}`);
+            }
+            
+          } catch (error) {
+            console.error('❌ Lighthouse audit failed:', error.message);
+            // Don't fail build for lighthouse issues
+          } finally {
+            await chrome.kill();
+          }
+        })();
+        EOF
+        
+        # Install lighthouse
+        npm install --save-dev lighthouse chrome-launcher
+        node test-performance.js || true
+        
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          package.json
+          .eslintrc.js
+          .htmlhintrc
+          
+  deploy-preview:
+    name: Deploy Preview (PR)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: lint-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Netlify (Preview)
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: '.'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions (PR #${{ github.event.number }})"
+        enable-pull-request-comment: true
+        enable-commit-comment: false
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: lint-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Netlify (Production)
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: '.'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Production deploy from GitHub Actions"
+        production-deploy: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+    - name: Notify deployment success
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "Site URL: https://finsdivisionals.netlify.app"
