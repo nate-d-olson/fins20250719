@@ -155,17 +155,17 @@
             /* Make controls container more accessible on mobile */
             #controlsContainer {
                 position: sticky !important;
-                top: 120px !important;
+                top: 90px !important;
                 left: 0 !important;
                 right: 0 !important;
-                margin: 0 0 20px 0 !important;
+                margin: 0 0 16px 0 !important;
                 z-index: 40 !important;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
             }
             
             /* Add top margin to content to account for fixed controls */
             #meet-program {
-                margin-top: 200px !important;
+                margin-top: 0 !important;
             }
         }
 
@@ -297,25 +297,25 @@
 
     <!-- Main Header -->
     <header class="bg-white shadow-sm sticky top-0 z-20">
-        <div class="max-w-4xl mx-auto px-4 py-3 md:py-4 text-center">
-            <h1 class="text-lg md:text-2xl font-bold text-gray-900">MCSL Division H Championship</h1>
-            <p class="text-sm md:text-md text-gray-500">July 19, 2025</p>
-            <div class="text-sm md:text-lg font-semibold mt-1 md:mt-2 flex justify-center items-center flex-wrap gap-x-2 md:gap-x-4">
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #fee2e2;"></div><span class="text-xs md:text-base" style="color: #dc2626;">Rock Creek (RC)</span></span>
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dbeafe;"></div><span class="text-xs md:text-base" style="color: #1e40af;">Calverton (CA)</span></span>
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e2e8f0;"></div><span class="text-xs md:text-base" style="color: #172554;">Glenmont (GP)</span></span>
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dcfce7;"></div><span class="text-xs md:text-base" style="color: #166534;">Daleview (DV)</span></span>
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #ffedd5;"></div><span class="text-xs md:text-base" style="color: #9a3412;">Hillandale (HA)</span></span>
-                <span class="flex items-center"><div class="w-2 h-2 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e0e7ff;"></div><span class="text-xs md:text-base" style="color: #312e81;">Twinbrook (TW)</span></span>
+        <div class="max-w-4xl mx-auto px-4 py-2 md:py-4 text-center">
+            <h1 class="text-base md:text-2xl font-bold text-gray-900">MCSL Division H Championship</h1>
+            <p class="text-xs md:text-md text-gray-500">July 19, 2025</p>
+            <div class="text-xs md:text-lg font-medium mt-1 md:mt-2 flex justify-center items-center flex-wrap gap-x-1 md:gap-x-4">
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #fee2e2;"></div><span class="text-xs md:text-base" style="color: #dc2626;">RC</span></span>
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dbeafe;"></div><span class="text-xs md:text-base" style="color: #1e40af;">CA</span></span>
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e2e8f0;"></div><span class="text-xs md:text-base" style="color: #172554;">GP</span></span>
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #dcfce7;"></div><span class="text-xs md:text-base" style="color: #166534;">DV</span></span>
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #ffedd5;"></div><span class="text-xs md:text-base" style="color: #9a3412;">HA</span></span>
+                <span class="flex items-center"><div class="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full mr-1 md:mr-2" style="background-color: #e0e7ff;"></div><span class="text-xs md:text-base" style="color: #312e81;">TW</span></span>
             </div>
         </div>
         <!-- Tabs -->
         <nav class="border-b border-gray-200">
             <div class="max-w-4xl mx-auto flex justify-center -mb-px">
-                <button class="tab-link active w-1/2 py-3 md:py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Program')">
+                <button class="tab-link active w-1/2 py-2 md:py-4 px-1 text-center border-b-2 font-medium text-xs md:text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Program')">
                     Meet Program
                 </button>
-                <button class="tab-link w-1/2 py-3 md:py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Records')">
+                <button class="tab-link w-1/2 py-2 md:py-4 px-1 text-center border-b-2 border-transparent font-medium text-xs md:text-sm text-gray-500 hover:text-red-600 hover:border-red-500" onclick="openTab(event, 'Records')">
                     Records & All-Stars
                 </button>
             </div>
@@ -326,48 +326,48 @@
         <!-- Meet Program Content -->
         <div id="Program" class="content active">
             <!-- Collapsible Controls Container -->
-            <div id="controlsContainer" class="bg-white rounded-xl shadow-md mb-6 sticky top-[140px] md:top-[155px] z-10">
-                <div class="flex justify-between items-center p-3 md:p-4 border-b border-gray-200">
-                    <h3 class="text-base md:text-lg font-semibold">Tools & Filters</h3>
-                    <button id="toggleControlsBtn" class="p-2 rounded-full hover:bg-gray-100 touch-manipulation">
-                        <svg id="toggleIcon" class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+            <div id="controlsContainer" class="bg-white rounded-lg md:rounded-xl shadow-md mb-4 md:mb-6 sticky top-[90px] md:top-[155px] z-10">
+                <div class="flex justify-between items-center p-2 md:p-4 border-b border-gray-200">
+                    <h3 class="text-sm md:text-lg font-semibold">Tools & Filters</h3>
+                    <button id="toggleControlsBtn" class="p-1 md:p-2 rounded-full hover:bg-gray-100 touch-manipulation">
+                        <svg id="toggleIcon" class="w-4 h-4 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                     </button>
                 </div>
 
-                <div id="controlsContent" class="controls-content p-3 md:p-4">
+                <div id="controlsContent" class="controls-content p-2 md:p-4">
                     <!-- Combined search controls -->
-                    <div class="space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
+                    <div class="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Search & Pin Swimmers</label>
+                            <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Search & Pin Swimmers</label>
                             <div class="relative">
-                                <input type="text" id="swimmerSearch" onkeyup="handleCombinedSearch()" onfocus="showSearchOptions()" placeholder="Search swimmers..." class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
+                                <input type="text" id="swimmerSearch" onkeyup="handleCombinedSearch()" onfocus="showSearchOptions()" placeholder="Search swimmers..." class="w-full px-2 py-1.5 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-md md:rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
                                 <div id="searchOptions" class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-30 hidden"></div>
                             </div>
-                            <div class="mt-2 flex items-center space-x-4">
+                            <div class="mt-1 md:mt-2 flex items-center space-x-3 md:space-x-4">
                                 <div class="flex items-center">
-                                    <input id="searchMode" name="searchMode" type="radio" value="search" checked class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
-                                    <label for="searchMode" class="ml-2 block text-sm">Search</label>
+                                    <input id="searchMode" name="searchMode" type="radio" value="search" checked class="h-3 w-3 md:h-4 md:w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
+                                    <label for="searchMode" class="ml-1 md:ml-2 block text-xs md:text-sm">Search</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input id="pinMode" name="searchMode" type="radio" value="pin" class="h-4 w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
-                                    <label for="pinMode" class="ml-2 block text-sm">Pin</label>
+                                    <input id="pinMode" name="searchMode" type="radio" value="pin" class="h-3 w-3 md:h-4 md:w-4 text-red-600 border-gray-300 touch-manipulation" onchange="updateSearchMode()">
+                                    <label for="pinMode" class="ml-1 md:ml-2 block text-xs md:text-sm">Pin</label>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Jump to Event</label>
-                            <select id="eventJump" onchange="jumpToEvent()" class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
+                            <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Jump to Event</label>
+                            <select id="eventJump" onchange="jumpToEvent()" class="w-full px-2 py-1.5 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-md md:rounded-lg focus:ring-red-500 focus:border-red-500 touch-manipulation">
                                 <option value="">Select an event to jump to...</option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Secondary controls - collapsible on mobile -->
-                    <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-gray-200">
                         <div class="md:hidden">
-                            <button id="mobileAdvancedToggle" class="w-full text-left text-sm font-medium text-gray-700 py-2 flex justify-between items-center touch-manipulation">
+                            <button id="mobileAdvancedToggle" class="w-full text-left text-xs md:text-sm font-medium text-gray-700 py-1 md:py-2 flex justify-between items-center touch-manipulation">
                                 <span>Advanced Options</span>
-                                <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3 h-3 md:w-4 md:h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
