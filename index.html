@@ -838,18 +838,32 @@
     }
     
     function jumpToEvent() {
-        const select = document.getElementById('eventJump');
-        const eventNumber = select.value;
-        if (!eventNumber) return;
+    const select = document.getElementById('eventJump');
+    const eventNumber = select.value;
+    if (!eventNumber) return;
 
-        const eventCards = document.querySelectorAll('#meet-program .event-card');
-        const targetIndex = Array.from(eventCards).findIndex(card => card.id === `event-${eventNumber}`);
+    const eventCards = document.querySelectorAll('#meet-program .event-card');
+    const targetIndex = Array.from(eventCards).findIndex(card => card.id === `event-${eventNumber}`);
 
-        if (targetIndex !== -1) {
-            currentEventIndex = targetIndex;
-            updateView(); // This will handle showing the correct event and scrolling
+    if (targetIndex !== -1) {
+        currentEventIndex = targetIndex;
+
+        // Scroll to the selected event
+        const targetElement = eventCards[currentEventIndex];
+        if (targetElement) {
+            const headerOffset = document.getElementById('controlsContainer').offsetHeight + 20;
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+
+        // Update view for Single mode only
+        if (viewMode === 'single') {
+            updateView();
         }
     }
+}
     
     // --- NEW VIEW AND COLUMN FUNCTIONS ---
 
